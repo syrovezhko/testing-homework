@@ -228,4 +228,33 @@ describe('Каталог:', async () => {
             }
         })
     })
+    it('4. если товар уже добавлен в корзину, в каталоге и на странице товара должно отображаться сообщение об этом', async ({ browser }) => {
+        it(`после добавления в карзину появляется надпись Item in cart`, async ({ browser }) => {
+            await browser.url(main_url + `/catalog/0`);
+            const button = await browser.$(`.ProductDetails-AddToCart`)
+            await button.click()
+            const cartBadge = await browser.$(`.CartBadge`)
+            assert.equal(await cartBadge.isDisplayed(), true, `появляется надпись Item in cart`);
+            await browser.assertView(`cartBadge`, '.ProductDetails', {
+                screenshotDelay: 1000,
+                compositeImage: true,
+                ignoreElements: [
+                    ".ProductDetails-Name",
+                    ".ProductDetails-Description",
+                    ".ProductDetails-Price",
+                    ".ProductDetails-Color",
+                    ".ProductDetails-Material",
+                    ".Image",
+                ],
+            });
+            await browser.url(main_url + '/catalog');
+            const cardInCart = await browser.$(`.ProductItem[data-testid="0"] .CartBadge`)
+            assert.equal(await cardInCart.isDisplayed(), true, `появляется надпись Item in cart`);
+            const cardNotInCart = await browser.$(`.ProductItem[data-testid="1"] .CartBadge`)
+            assert.equal(await cardNotInCart.isDisplayed(), false, `скрыта надпись Item in cart`);
+            await browser.url(main_url + `/catalog/0`);
+            const cartBadgeAgain = await browser.$(`.CartBadge`)
+            assert.equal(await cartBadgeAgain.isDisplayed(), true, `появляется надпись Item in cart`);
+        })
+    })
 })
