@@ -98,3 +98,46 @@ describe('Общие требования:', async () => {
         }
     });
 });
+
+describe('Страницы:', async () => {
+    const capitalize = (s) => (s[0].toUpperCase() + s.slice(1));
+    it('1. в магазине должны быть страницы: главная, каталог, условия доставки, контакты', async ({ browser }) => {
+        const pages = [
+            'catalog',
+            'delivery',
+            'contacts',
+            ''
+        ]
+        for(const page of pages) {
+            it(`в магазине есть страница ${page === '' ? 'main' : page}`, async ({ browser }) => {
+                await browser.url(main_url + `/${page}`);
+                const app = await browser.$('.Application');
+                await app.waitForExist();
+                const title = await browser.$(`.${capitalize(`${page === '' ? 'main' : page}`)}`);
+                assert.equal(await title.isDisplayed(), true, `есть страница ${page === '' ? 'main' : page}`);
+            })
+        }
+    })
+    
+    it('2. страницы главная, условия доставки, контакты должны иметь статическое содержимое', async ({ browser }) => {
+        const pages = [
+            'delivery',
+            'contacts',
+            ''
+        ]
+
+        pages.forEach(page => isStatic(page))
+        
+        function isStatic(page) {
+            it(`Страница ${page} имеет статическое содержимое`, async ({ browser }) => {
+                await browser.url(main_url + `/${page}`);
+                const app = await browser.$('.Application');
+                await app.waitForExist();
+                await browser.assertView(`plain${page}`, '.Application', {
+                    screenshotDelay: 1000,
+                    compositeImage: true,
+                });
+            })
+        }
+    })
+})
