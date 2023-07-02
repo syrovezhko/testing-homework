@@ -257,4 +257,21 @@ describe('Каталог:', async () => {
             assert.equal(await cartBadgeAgain.isDisplayed(), true, `появляется надпись Item in cart`);
         })
     })
+    it('5. если товар уже добавлен в корзину, повторное нажатие кнопки "добавить в корзину" должно увеличивать его количество', async ({ browser }) => {
+        it(`увеличивать количество товара незначительно`, async ({ browser }) => {
+            await browser.url(main_url + `/catalog/0`);
+            const button = await browser.$(`.ProductDetails-AddToCart`);
+            await button.click();
+            await browser.url(main_url + `/catalog/0`);
+            const buttonAgain = await browser.$(`.ProductDetails-AddToCart`);
+            await buttonAgain.click();
+            const puppeteer = await browser.getPuppeteer();
+            const [page] = await puppeteer.pages();
+            await page.goto(main_url + `/cart`);
+            await page.waitForSelector(`.Cart`);
+            const elementCount = await page.$(`tr[data-testid="0"] .Cart-Count`);
+            const productCount = await page.evaluate(el => el.textContent, elementCount);
+            assert.equal(productCount, '2', `количество добавленного продукта в корзине корректно`);
+        })
+    })
 })
