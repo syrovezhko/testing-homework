@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, getByTestId } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import { BrowserRouter } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
@@ -160,7 +160,7 @@ const initialStoreProducts = [
 const store = createStore(reducer);
 
 describe("Catalog", () => {
-  it("all products rendered", async () => {
+  it("are all products rendered", async () => {
     jest.spyOn(reduxHooks, "useSelector").mockReturnValue(initialStoreProducts);
 
     const app = (
@@ -176,4 +176,26 @@ describe("Catalog", () => {
       initialStoreProducts.length
     );
   });
+
+  
+  it("are all products data rendered", async () => {
+    jest.spyOn(reduxHooks, "useSelector").mockReturnValue(initialStoreProducts);
+
+    const app = (
+      <BrowserRouter>
+        <Provider store={store}>
+          <Catalog />
+        </Provider>
+      </BrowserRouter>
+    );
+    const { container } = render(app);
+
+    const products =  container.getElementsByClassName("ProductItem")
+    for(const i in initialStoreProducts) {
+      expect(products[i].getElementsByClassName('ProductItem-Name').length).toEqual(1)
+      expect(products[i].getElementsByClassName('ProductItem-Price').length).toEqual(1)
+      expect(products[i].getElementsByClassName('ProductItem-DetailsLink').length).toEqual(1)
+    }
+  });
 });
+
