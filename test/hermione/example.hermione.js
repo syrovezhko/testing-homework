@@ -180,4 +180,37 @@ describe('Каталог:', async () => {
             index++;
         }
     })
+    it('3. на странице с подробной информацией отображаются: название товара, его описание, цена, цвет, материал и кнопка * * "добавить в корзину"', async ({ browser }) => {
+        const params = ['Name', 'Description', 'Price', 'Color', 'Material']
+        for (const param of params) {
+    
+            it(`на каждой странице с подробной информацией отображается ${param}`, async ({ browser }) => {
+                const puppeteer = await browser.getPuppeteer();
+                const [page] = await puppeteer.pages();
+                await page.goto(api_url);
+                await page.content();
+                const products = await page.evaluate(() => {
+                    return JSON.parse(document.querySelector("body").innerText);
+                });
+                for (const index in products) {
+    
+                    await page.goto(api_url + `/${index}`);
+                    await page.content();
+                    const uniqProduct = await page.evaluate(() => {
+                        return JSON.parse(document.querySelector("body").innerText);
+                    });
+    
+                    await page.goto(main_url + `/catalog/${index}`);
+                    await page.waitForSelector(`.ProductDetails`)
+    
+                    const element = await page.$(`.ProductDetails-${param}`)
+                    const text = await page.evaluate(el => el.textContent, element)
+                    if (param === 'Price') {
+                        uniqProduct[param.toLowerCase()] = `$${uniqProduct[param.toLowerCase()]}`
+                    }
+                    assert.equal(text, uniqProduct[param.toLowerCase()], `${param} продукта ${uniqProduct[param.toLowerCase()]} корректно`);
+                }
+            })
+        }
+    })
 })
