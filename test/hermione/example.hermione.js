@@ -73,9 +73,27 @@ describe('Общие требования:', async () => {
                 await browser.url(main_url);
                 const app = await browser.$('.Application');
                 await app.waitForExist();
-
                 const link = await browser.$(`.nav-link[href*="/hw/store/${page}"]`);
                 assert.equal(await link.isDisplayed(), true, `видна ссылка на ${page}`);
+            })
+        }
+    });
+
+    it('7. название магазина в шапке должно быть ссылкой на главную страницу', async ({ browser }) => {
+        const pages = [
+            'catalog',
+            'catalog/0',
+            'delivery',
+            'contacts',
+            'cart'
+        ]
+        for(const page of pages) {
+            it(`название магазина в шапке на странице ${page} ведет на глвную`, async ({ browser }) => {
+                await browser.url(main_url + `/${page}`);
+                const app = await browser.$('.Application');
+                await app.waitForExist();
+                const link = await browser.$(`.Application-Brand`);
+                assert.equal(await link.getAttribute('href'), '/hw/store', `ведет на глвную со страници ${page}`);
             })
         }
     });
