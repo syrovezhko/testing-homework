@@ -162,4 +162,22 @@ describe('Каталог:', async () => {
             index++;
         }
     })
+    it('2. для каждого товара в каталоге отображается название, цена и ссылка на страницу с подробной информацией о товаре', async ({ browser }) => {
+        const puppeteer = await browser.getPuppeteer();
+        const [page] = await puppeteer.pages();
+        await page.goto(api_url);
+        await page.content();
+        products = await page.evaluate(() => {
+            return JSON.parse(document.querySelector('body').innerText)
+        })
+        let index = 0
+        for(const product of products) {
+            await page.goto(main_url + `/catalog/${index}`);
+            await page.waitForSelector('.ProductDetails');
+            const elementName = await page.$(`.ProductDetails-Name`);
+            const productName = await page.evaluate(el => el.textContent, elementName);
+            assert.equal(productName, product.name, `название ${product.name} подходит`);
+            index++;
+        }
+    })
 })
