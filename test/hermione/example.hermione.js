@@ -394,24 +394,20 @@ describe('Корзина:', async () =>{
         it(`два разных товара`, async ({ browser }) => {
             const index = 0
             await browser.url(main_url + `/catalog/${index}`);
-            const button = await browser.$(`.ProductDetails-AddToCart`)
-            await button.click()
-    
+            const button = await browser.$(`.ProductDetails-AddToCart`);
+            await button.click();
             await browser.url(main_url + `/catalog/${index + 1}`);
-            const buttonAgain = await browser.$(`.ProductDetails-AddToCart`)
-            await buttonAgain.click()
-    
+            const buttonAgain = await browser.$(`.ProductDetails-AddToCart`);
+            await buttonAgain.click();
             await browser.url(main_url + `/cart`);
-            const buttonClear = await browser.$(`.Cart-Clear`)
-            await buttonClear.click()
-    
+            const buttonClear = await browser.$(`.Cart-Clear`);
+            await buttonClear.click();
             const puppeteer = await browser.getPuppeteer();
             const [page] = await puppeteer.pages();
             await page.goto(main_url + `/cart`);
-            await page.waitForSelector(`.Cart`)
-    
+            await page.waitForSelector(`.Cart`);
             const col = await browser.$(`.col`);
-            const colContent = await page.evaluate(el => el.textContent, col)
+            const colContent = await page.evaluate(el => el.textContent, col);
             assert.equal(colContent, `'test`, `корзина очистилась корректно`);
     
         })
