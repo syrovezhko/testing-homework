@@ -212,5 +212,20 @@ describe('Каталог:', async () => {
                 }
             })
         }
+        it(`на каждой странице с подробной информацией отображается кнопка "добавить в корзину"`, async ({ browser }) => {
+            const puppeteer = await browser.getPuppeteer();
+            const [page] = await puppeteer.pages();
+            await page.goto(api_url);
+            await page.content();
+            const products = await page.evaluate(() => {
+                return JSON.parse(document.querySelector("body").innerText);
+            });
+            for (const index in products) {
+    
+                await browser.url(main_url + `/catalog/${index}`);
+                const element = await browser.$(`.ProductDetails-AddToCart`)
+                assert.equal(await element.isDisplayed(), true, 'кнопка меню добавить отображается');
+            }
+        })
     })
 })
