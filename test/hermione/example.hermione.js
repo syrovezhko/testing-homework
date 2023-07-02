@@ -274,4 +274,24 @@ describe('Каталог:', async () => {
             assert.equal(productCount, '2', `количество добавленного продукта в корзине корректно`);
         })
     })
+    it('6. содержимое корзины должно сохраняться между перезагрузками страницы', async ({ browser }) => {
+        it(`перезагрузка корзины`, async ({ browser }) => {
+            await browser.url(main_url + `/catalog/0`);
+            const button = await browser.$(`.ProductDetails-AddToCart`);
+            await button.click();
+            await browser.url(main_url + `/catalog/1`);
+            const buttonAgain = await browser.$(`.ProductDetails-AddToCart`);
+            await buttonAgain.click();
+            const puppeteer = await browser.getPuppeteer();
+            const [page] = await puppeteer.pages();
+            await page.goto(main_url + `/cart`);
+            await page.waitForSelector(`.Cart`);
+            const cartTable = await page.$(`.Cart-Table`);
+            const cartTableContent = await page.evaluate(el => el.textContent, cartTable);
+            await page.reload();
+            const cartTableAgain = await page.$(`.Cart-Table`);
+            const cartTableContentAgain = await page.evaluate(el => el.textContent, cartTableAgain);
+            assert.equal(cartTableContent, cartTableContentAgain, `содержимое корзины в норме`);
+        })
+    })
 })
