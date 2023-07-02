@@ -2,6 +2,7 @@ const { assert } = require('chai');
 
 let bug_id = 0;
 let base_url = 'http://localhost:3000/hw/store';
+let api_url = 'http://localhost:3000/hw/store/api/products';
 let bug_url = `http://localhost:3000/hw/store?bug_id=${bug_id}`;
 let main_url = base_url;
 
@@ -138,6 +139,27 @@ describe('Страницы:', async () => {
                     compositeImage: true,
                 });
             })
+        }
+    })
+})
+
+describe('Каталог:', async () => {
+    it('1. в каталоге должны отображаться товары, список которых приходит с сервера', async ({ browser }) => {
+        const puppeteer = await browser.getPuppeteer();
+        const [page] = await puppeteer.pages();
+        await page.goto(api_url);
+        await page.content();
+        products = await page.evaluate(() => {
+            return JSON.parse(document.querySelector('body').innerText)
+        })
+        let index = 0
+        for(const product of products) {
+            await browser.url(main_url + `/catalog`);
+            const app = await browser.$('.Application');
+            await app.waitForExist();
+            const productElement = await browser.$(`.ProductItem[data-testid="${index}"]`);
+            assert.equal(await productElement.isDisplayed(), true, `${index} должен отоброжается`);
+            index++;
         }
     })
 })
