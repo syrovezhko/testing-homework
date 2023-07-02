@@ -5,11 +5,7 @@ import { BrowserRouter } from "react-router-dom";
 import { Provider, useSelector } from "react-redux";
 import { createStore } from "redux";
 import { Product } from "./../../src/client/pages/Product";
-
-import userEvent from "@testing-library/user-event";
 import * as reduxHooks from "react-redux";
-// import * as routerHooks from "react-router";
-import routeData from "react-router";
 
 const initialState = {
   cart: {},
@@ -32,7 +28,7 @@ const initialStoreProduct = {
 const store = createStore(reducer);
 
 describe("Product", () => {
-  it("products info", async () => {
+  it("products length", async () => {
     jest.spyOn(reduxHooks, "useSelector").mockReturnValue(initialStoreProduct);
 
     jest.mock("react-router-dom", () => ({
@@ -57,6 +53,5 @@ describe("Product", () => {
     expect(container.getElementsByClassName('ProductDetails-Color')[0].innerHTML).toEqual(initialStoreProduct.color)
     expect(container.getElementsByClassName('ProductDetails-Material')[0].innerHTML).toEqual(initialStoreProduct.material)
     expect(container.getElementsByClassName('ProductDetails-AddToCart').length).toEqual(1)
-    expect(container).toMatchSnapshot
   });
 });
