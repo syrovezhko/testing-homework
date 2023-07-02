@@ -3,7 +3,7 @@ const { assert } = require('chai');
 let bug_id = 0;
 let base_url = 'http://localhost:3000/hw/store';
 let bug_url = `http://localhost:3000/hw/store?bug_id=${bug_id}`;
-let main_url = base_url; // можно изменить тестовый url
+let main_url = base_url;
 
 if (process.env.BUG_ID !== undefined) {
     bug_id = process.env.BUG_ID;
@@ -59,5 +59,24 @@ describe('Общие требования:', async () => {
 
         await appMenu.click();
         assert.equal(await appMenu.isDisplayed(), false, 'Меню должно закрыться при выборе элемента');
+    });
+
+    it('6. в шапке отображаются ссылки на страницы магазина, а также ссылка на корзину', async ({ browser }) => {
+        const pages = [
+            'catalog',
+            'delivery',
+            'contacts',
+            'cart'
+        ]
+        for(const page of pages) {
+            it(`в шапке отображается ссылка на ${page}`, async ({ browser }) => {
+                await browser.url(main_url);
+                const app = await browser.$('.Application');
+                await app.waitForExist();
+
+                const link = await browser.$(`.nav-link[href*="/hw/store/${page}"]`);
+                assert.equal(await link.isDisplayed(), true, `видна ссылка на ${page}`);
+            })
+        }
     });
 });
